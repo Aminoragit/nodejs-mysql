@@ -105,6 +105,8 @@ var app = http.createServer(function(request,response){
               //삽입한 행의 id값이 무엇인지를 알아야한다.
               //mysql nodejs insert id로 검색하면 나올것이다.
               //result.inserId임을 알수 있다.
+              //create됬으면 생성된 id=값 으로 바로 redirect 해주는것
+              //writeHead(302)가 발동되면 {Location:`~~~~~`로 자동 이동}
               response.writeHead(302, {Location: `/?id=${result.insertId}`});
               response.end();
             }
@@ -147,6 +149,7 @@ var app = http.createServer(function(request,response){
           var description = post.description;
           fs.rename(`data/${id}`, `data/${title}`, function(error){
             fs.writeFile(`data/${title}`, description, 'utf8', function(err){
+              console.log(result);
               response.writeHead(302, {Location: `/?id=${title}`});
               response.end();
             })
