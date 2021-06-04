@@ -88,7 +88,12 @@ var app = http.createServer(function(request,response){
           body = body + data;
       });
       request.on('end', function(){
+          //var qs = require('querystring');
+          //Post로 전달된 query중 body부분을 파싱
+
           var post = qs.parse(body);
+          //create_process 실행시 topic(table)에 데이터 입력하는 구문
+
           db.query(`
             INSERT INTO topic (title, description, created, author_id)
               VALUES(?, ?, NOW(), ?)`,
@@ -97,6 +102,9 @@ var app = http.createServer(function(request,response){
               if(error){
                 throw error;
               }
+              //삽입한 행의 id값이 무엇인지를 알아야한다.
+              //mysql nodejs insert id로 검색하면 나올것이다.
+              //result.inserId임을 알수 있다.
               response.writeHead(302, {Location: `/?id=${result.insertId}`});
               response.end();
             }
