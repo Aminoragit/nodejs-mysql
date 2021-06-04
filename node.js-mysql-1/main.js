@@ -113,12 +113,18 @@ var app = http.createServer(function(request,response){
           )
       });
     } else if(pathname === '/update'){
-      fs.readdir('./data', function(error, filelist){
-        var filteredId = path.parse(queryData.id).base;
-        fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
-          var title = queryData.id;
-          var list = template.list(filelist);
-          var html = template.HTML(title, list,
+      db.query(`SELECT * FROM topic`, function(error,topics){
+       if(error){
+         throw error;
+       }
+       db.query(`SELECT * FROM topic WHERE id=?`,[queryData.id], function(error2, topic){
+         if(error2){
+           throw error2;
+         }
+        var title = topic[0].title;
+        var description = topic[0].description;
+        var list = template.list(topics);
+        var html = template.HTML(title, list,
             `
             <form action="/update_process" method="post">
               <input type="hidden" name="id" value="${title}">
