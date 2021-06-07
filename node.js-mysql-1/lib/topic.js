@@ -53,7 +53,6 @@ exports.page=function(request,response){
     })
   });
 }
-
 exports.create=function(request,response){
   db.query(`SELECT * FROM topic`, function(error, topics) {
     db.query('SELECT * FROM author',function(error2,authors){
@@ -80,7 +79,6 @@ exports.create=function(request,response){
     });
   });
 }
-
 exports.create_process=function(request,response){
   var body = '';
   request.on('data', function(data) {
