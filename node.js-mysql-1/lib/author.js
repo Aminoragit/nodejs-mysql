@@ -2,7 +2,7 @@ var db = require('./db');
 var template = require('./template.js');
 var qs = require('querystring');
 var url = require('url');
-
+var sanitizeHtml = require('sanitize-html');
 
 exports.home = function(request, response){
     db.query(`SELECT * FROM topic`, function(error,topics){
@@ -22,10 +22,10 @@ exports.home = function(request, response){
             </style>
             <form action="/author/create_process" method="post">
                 <p>
-                    <input type="text" name="name" placeholder="name">
+                <input type="text" name="name" value="${sanitizeHtml(author[0].name)}" placeholder="name">
                 </p>
                 <p>
-                    <textarea name="profile" placeholder="description"></textarea>
+                <textarea name="profile" placeholder="description">${sanitizeHtml(author[0].profile)}</textarea>
                 </p>
                 <p>
                     <input type="submit" value="create">

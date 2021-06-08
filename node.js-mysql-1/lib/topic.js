@@ -2,6 +2,7 @@ var db = require('./db');
 var template = require('./template.js');
 var url = require('url');
 var qs = require('querystring');
+var sanitizeHtml = require('sanitize-html');
 
 //1개면 module.exports  여러개면 걍 exports를 쓰면된다.
 exports.home=function(request,response){
@@ -32,6 +33,13 @@ exports.page=function(request,response){
     //id=?`,[~~~.id]처럼 ?를 사용하여야만 한다
     //왜냐하면 ?가 없이 [~~~.id]를 그대로 사용하면 SQL 공격에 그대로 노출되지만
     //?`를 쓰게 되면 `안에 제한되므로 SQL공격을 SQL문이 아닌 단순한 문자열로 취급하여 SQL공격을 방지할수 있다
+
+
+
+    //sql injection 방지법
+    //1. 위에처럼 ?를 활용한다.
+    //2. ${db.escape(queryData.id)} 처럼 db.escape(문자)는 `문자`와 같이 만들어주는 함수이다.
+    //그러나 db.escape()를 까먹을수도 있으니 걍 ?를 써라
     db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [queryData.id], function(error2, topic) {
       if (error2) {
         throw error2;
@@ -42,11 +50,11 @@ exports.page=function(request,response){
       var list = template.list(topics);
       var html = template.HTML(title, list,
         `
-        <h2>${title}</h2>
-        ${description}
-        <p>by ${topic[0].name}</p>
-        `,
-        ` <a href="/create">create</a>
+        <h2>${sanitizeHtml(title)}</h2>
+           ${sanitizeHtml(description)}
+           <p>by ${sanitizeHtml(topic[0].name)}</p>
+           `,
+           ` <a href="/create">create</a>
             <a href="/update?id=${queryData.id}">update</a>
             <form action="delete_process" method="post">
               <input type="hidden" name="id" value="${queryData.id}">
@@ -63,7 +71,7 @@ exports.create=function(request,response){
     db.query('SELECT * FROM author',function(error2,authors){
       var title = 'Create';
       var list = template.list(topics);
-      var html = template.HTML(title, list,
+      var html = template.HTML(sanitizeHtml(title), list,
         `
           <form action="/create_process" method="post">
             <p><input type="text" name="title" placeholder="title"></p>
@@ -130,13 +138,13 @@ exports.update=function(request,response){
       }
       db.query('SELECT * FROM author', function(error2, authors){
         var list = template.list(topics);
-        var html = template.HTML(topic[0].title, list,
+        var html = template.HTML(sanitizeHtml(topic[0].title), list,
           `
           <form action="/update_process" method="post">
             <input type="hidden" name="id" value="${topic[0].id}">
-            <p><input type="text" name="title" placeholder="title" value="${topic[0].title}"></p>
+            <p><input type="text" name="title" placeholder="title" value="${sanitizeHtml(topic[0].title)}"></p>
             <p>
-              <textarea name="description" placeholder="description">${topic[0].description}</textarea>
+            <textarea name="description" placeholder="description">${sanitizeHtml(topic[0].description)}</textarea>
             </p>
             <p>
               ${template.authorSelect(authors, topic[0].author_id)}
