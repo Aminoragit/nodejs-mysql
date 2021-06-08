@@ -9,6 +9,7 @@ module.exports = {
     </head>
     <body>
       <h1><a href="/">WEB</a></h1>
+      <a href="/author">author</a>
       ${list}
       ${control}
       ${body}
@@ -19,7 +20,10 @@ module.exports = {
     var list = '<ul>';
     var i = 0;
     while(i < topics.length){
-      list = list + `<li><a href="/?id=${topics[i].id}">${topics[i].title}</a></li>`;
+      list = list + `
+      <li>
+        <a href="/?id=${topics[i].id}">${topics[i].title}</a>
+      </li>`;
       i = i + 1;
     }
     list = list+'</ul>';
@@ -35,7 +39,8 @@ module.exports = {
       if(authors[i].id === author_id) {
         selected = ' selected';
       }
-      tag += `<option value="${authors[i].id}"${selected}>${authors[i].name}</option>`;
+      tag += `
+      <option value="${authors[i].id}"${selected}>${authors[i].name}</option>`;
       i++;
     }
     return `
@@ -43,5 +48,30 @@ module.exports = {
         ${tag}
       </select>
     `
+  },authorTable:function(authors){
+    var tag = '<table>';
+    var i = 0;
+
+
+    //주의 할점
+    //DELETE를 할떄에는 반드시 href가 아닌 form 형식으로 해줘야 한다 반드시!!!
+    while(i < authors.length){
+        tag += `
+            <tr>
+                <td>${authors[i].name}</td>
+                <td>${authors[i].profile}</td>
+                <td><a href="/author/update?id=${authors[i].id}">update</a></td>
+                <td>
+                  <form action="/author/delete_process" method="post">
+                      <input type="hidden" name="id" value="${authors[i].id}">
+                      <input type="submit" value="delete">
+                   </form>
+                </td>
+            </tr>
+            `
+        i++;
+    }
+    tag += '</table>';
+    return tag;
   }
 }
