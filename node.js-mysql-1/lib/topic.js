@@ -27,6 +27,11 @@ exports.page=function(request,response){
       throw error;
     }
     //WHERE에서 id만 쓰면 에러남 -> topic테이블의 id인지 author테이블의 id인지 불명확해서 그럼
+    //SQL Injection 공격 보안 -> DROP TABLE topic;을 실행하면 topic 테이블이 삭제되버린다.
+    //이처럼 sql문을 통한공격을 방지하기 위해서는 반드시
+    //id=?`,[~~~.id]처럼 ?를 사용하여야만 한다
+    //왜냐하면 ?가 없이 [~~~.id]를 그대로 사용하면 SQL 공격에 그대로 노출되지만
+    //?`를 쓰게 되면 `안에 제한되므로 SQL공격을 SQL문이 아닌 단순한 문자열로 취급하여 SQL공격을 방지할수 있다
     db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [queryData.id], function(error2, topic) {
       if (error2) {
         throw error2;
